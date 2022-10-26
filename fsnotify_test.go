@@ -40,10 +40,14 @@ func TestWatch(t *testing.T) {
 		}, `
 			create  /file
 			write   /file
+			closewrite /file
 			remove  /file
 			create  /file
+			closewrite /file
 			write   /file
+			closewrite /file
 			write   /file
+			closewrite /file
 		`},
 
 		{"dir only", func(t *testing.T, w *Watcher, tmp string) {
@@ -59,6 +63,7 @@ func TestWatch(t *testing.T) {
 		}, `
 			create /file
 			write  /file
+			closewrite /file
 			remove /file
 			remove /beforewatch
 		`},
@@ -79,6 +84,7 @@ func TestWatch(t *testing.T) {
 		}, `
 			create /sub
 			create /file
+			closewrite /file
 			remove /sub
 			remove /file
 
@@ -118,6 +124,7 @@ func TestWatch(t *testing.T) {
 			rm(t, tmp, "file-unreadable")
 		}, `
 			WRITE     "/file"
+			CLOSEWRITE "/file"
 			REMOVE    "/file"
 			REMOVE    "/file-unreadable"
 
@@ -141,7 +148,9 @@ func TestWatch(t *testing.T) {
 			mkdir(t, tmp, "dir")
 		}, `
 			create   /file
+			closewrite /file
 			write    /file
+			closewrite /file
 			remove   /file
 			create   /dir
 		`},
@@ -156,6 +165,7 @@ func TestWatch(t *testing.T) {
 			cat(t, "hello", tmp, "file")
 		}, `
 			write    /file
+			closewrite /file
 		`},
 
 		{"watch a symlink to a file", func(t *testing.T, w *Watcher, tmp string) {
@@ -179,6 +189,7 @@ func TestWatch(t *testing.T) {
 			cat(t, "hello", file)
 		}, `
 			write    /link
+			closewrite /link
 
 			# TODO: Symlinks followed on kqueue; it shouldn't do this, but I'm
 			# afraid changing it will break stuff. See #227, #390
@@ -211,6 +222,7 @@ func TestWatch(t *testing.T) {
 			touch(t, dir, "file")
 		}, `
 			create    /link/file
+			closewrite /link/file
 
 			# TODO: Symlinks followed on kqueue; it shouldn't do this, but I'm
 			# afraid changing it will break stuff. See #227, #390
@@ -233,6 +245,7 @@ func TestWatchCreate(t *testing.T) {
 			touch(t, tmp, "file")
 		}, `
 			create  /file
+			closewrite /file
 		`},
 		{"create file with data", func(t *testing.T, w *Watcher, tmp string) {
 			addWatch(t, w, tmp)
@@ -240,6 +253,7 @@ func TestWatchCreate(t *testing.T) {
 		}, `
 			create  /file
 			write   /file
+			closewrite /file
 		`},
 
 		// Directories
@@ -335,6 +349,7 @@ func TestWatchWrite(t *testing.T) {
 		}, `
 			write  /file  # truncate
 			write  /file  # write
+			closewrite /file
 
 			# Truncate is chmod on kqueue, except NetBSD
 			netbsd:
@@ -369,6 +384,7 @@ func TestWatchWrite(t *testing.T) {
 		}, `
 			write  /file  # write X
 			write  /file  # write Y
+			closewrite /file
 		`},
 	}
 	for _, tt := range tests {
@@ -418,8 +434,10 @@ func TestWatchRename(t *testing.T) {
 		}, `
 			create /file # cat data >file
 			write  /file # ^
+			closewrite /file
 			rename /file # mv file ../renamed
 			create /file # touch file
+			closewrite /file
 
 			# Windows has REMOVE /file, rather than CREATE /file
 			windows:
@@ -501,6 +519,7 @@ func TestWatchRename(t *testing.T) {
 			rename /file    # mv file rename
 			                # Watcher gets removed on rename, so no write for /rename
 			write  /file    # cat hello >file
+			closewrite /file
 
 			# TODO(v2): Windows should behave the same by default. See #518
 			windows:
@@ -564,6 +583,7 @@ func TestWatchSymlink(t *testing.T) {
 				remove    /link
 				create    /link
 				write     /link
+				closewrite /link
 		`},
 
 		// Bug #277
@@ -588,6 +608,7 @@ func TestWatchSymlink(t *testing.T) {
 			rmAll(t, tmp, "pear")
 		}, `
 			create   /foo     # touch foo
+			closewrite /foo
 			remove   /foo     # rm foo
 			create   /apple   # mkdir apple
 			rename   /apple   # mv apple pear
@@ -627,6 +648,7 @@ func TestWatchAttrib(t *testing.T) {
 		}, `
 			CHMOD   "/file"
 			WRITE   "/file"
+			CLOSEWRITE "/file"
 
 			windows:
 				write /file
@@ -643,6 +665,7 @@ func TestWatchAttrib(t *testing.T) {
 		}, `
 			CHMOD   "/file"
 			WRITE   "/file"
+			CLOSEWRITE "/file"
 			CHMOD   "/file"
 
 			windows:
@@ -768,7 +791,8 @@ func TestWatchRm(t *testing.T) {
 }
 
 // TODO: this fails reguarly in the CI; not sure if it's a bug with the test or
-//       code; need to look in to it.
+//
+//	code; need to look in to it.
 func TestClose(t *testing.T) {
 	chanClosed := func(t *testing.T, w *Watcher) {
 		t.Helper()
@@ -988,7 +1012,8 @@ func TestAdd(t *testing.T) {
 }
 
 // TODO: should also check internal state is correct/cleaned up; e.g. no
-//       left-over file descriptors or whatnot.
+//
+//	left-over file descriptors or whatnot.
 func TestRemove(t *testing.T) {
 	t.Run("works", func(t *testing.T) {
 		t.Parallel()
@@ -1213,6 +1238,7 @@ func TestWatchStress(t *testing.T) {
 		n := "/" + prefix + fmtNum(i)
 		want[Event{Name: n, Op: Remove}] = struct{}{}
 		want[Event{Name: n, Op: Create}] = struct{}{}
+		want[Event{Name: n, Op: CloseWrite}] = struct{}{}
 	}
 
 	var extra Events

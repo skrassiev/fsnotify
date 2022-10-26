@@ -3,10 +3,10 @@
 //
 // Currently supported systems:
 //
-//    Linux 2.6.32+    via inotify
-//    BSD, macOS       via kqueue
-//    Windows          via ReadDirectoryChangesW
-//    illumos          via FEN
+//	Linux 2.6.32+    via inotify
+//	BSD, macOS       via kqueue
+//	Windows          via ReadDirectoryChangesW
+//	illumos          via FEN
 package fsnotify
 
 import (
@@ -42,6 +42,7 @@ const (
 	Remove
 	Rename
 	Chmod
+	CloseWrite
 )
 
 // Common errors that can be reported.
@@ -67,6 +68,9 @@ func (o Op) String() string {
 	}
 	if o.Has(Chmod) {
 		b.WriteString("|CHMOD")
+	}
+	if o.Has(CloseWrite) {
+		b.WriteString("|CLOSEWRITE")
 	}
 	if b.Len() == 0 {
 		return "[no events]"
