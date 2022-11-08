@@ -153,6 +153,13 @@ func TestWatch(t *testing.T) {
 			closewrite /file
 			remove   /file
 			create   /dir
+
+			windows:
+				create   /file
+				write    /file
+				remove   /file
+				create   /dir
+
 		`},
 
 		{"watch same file twice", func(t *testing.T, w *Watcher, tmp string) {
