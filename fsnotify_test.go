@@ -48,6 +48,14 @@ func TestWatch(t *testing.T) {
 			closewrite /file
 			write   /file
 			closewrite /file
+
+			windows:
+				create  /file
+				write   /file
+				remove  /file
+				create  /file
+				write   /file
+				write   /file
 		`},
 
 		{"dir only", func(t *testing.T, w *Watcher, tmp string) {
@@ -66,6 +74,12 @@ func TestWatch(t *testing.T) {
 			closewrite /file
 			remove /file
 			remove /beforewatch
+
+			windows:
+				create /file
+				write  /file
+				remove /file
+				remove /beforewatch
 		`},
 
 		{"subdir", func(t *testing.T, w *Watcher, tmp string) {
@@ -159,7 +173,6 @@ func TestWatch(t *testing.T) {
 				write    /file
 				remove   /file
 				create   /dir
-
 		`},
 
 		{"watch same file twice", func(t *testing.T, w *Watcher, tmp string) {
@@ -173,6 +186,9 @@ func TestWatch(t *testing.T) {
 		}, `
 			write    /file
 			closewrite /file
+
+			windows:
+				write    /file
 		`},
 
 		{"watch a symlink to a file", func(t *testing.T, w *Watcher, tmp string) {
@@ -235,6 +251,9 @@ func TestWatch(t *testing.T) {
 			# afraid changing it will break stuff. See #227, #390
 			kqueue:
 				create /dir/file
+
+			windows:
+				create    /link/file
 		`},
 	}
 
@@ -253,6 +272,9 @@ func TestWatchCreate(t *testing.T) {
 		}, `
 			create  /file
 			closewrite /file
+
+			windows:
+				create  /file
 		`},
 		{"create file with data", func(t *testing.T, w *Watcher, tmp string) {
 			addWatch(t, w, tmp)
@@ -261,6 +283,10 @@ func TestWatchCreate(t *testing.T) {
 			create  /file
 			write   /file
 			closewrite /file
+
+			windows:
+				create  /file
+				write   /file
 		`},
 
 		// Directories
@@ -364,6 +390,10 @@ func TestWatchWrite(t *testing.T) {
 			kqueue:
 				chmod     /file
 				write     /file
+
+			windows:
+				write  /file  # truncate
+				write  /file  # write
 		`},
 
 		{"multiple writes to a file", func(t *testing.T, w *Watcher, tmp string) {
@@ -392,6 +422,10 @@ func TestWatchWrite(t *testing.T) {
 			write  /file  # write X
 			write  /file  # write Y
 			closewrite /file
+
+			windows:
+				write  /file  # write X
+				write  /file  # write Y
 		`},
 	}
 	for _, tt := range tests {
@@ -586,11 +620,16 @@ func TestWatchSymlink(t *testing.T) {
 			write  /link
 			create /link
 
-			linux, windows, fen:
+			linux, fen:
 				remove    /link
 				create    /link
 				write     /link
 				closewrite /link
+
+			windows:
+				remove    /link
+				create    /link
+				write     /link
 		`},
 
 		// Bug #277
@@ -621,6 +660,14 @@ func TestWatchSymlink(t *testing.T) {
 			rename   /apple   # mv apple pear
 			create   /pear
 			remove   /pear    # rm -r pear
+
+			windows:
+				create   /foo     # touch foo
+				remove   /foo     # rm foo
+				create   /apple   # mkdir apple
+				rename   /apple   # mv apple pear
+				create   /pear
+				remove   /pear    # rm -r pear
 		`},
 	}
 
