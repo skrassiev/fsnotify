@@ -49,7 +49,7 @@ func TestWatch(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows:
+			windows, darwin:
 				create  /file
 				write   /file
 				remove  /file
@@ -75,7 +75,7 @@ func TestWatch(t *testing.T) {
 			remove /file
 			remove /beforewatch
 
-			windows:
+			windows, darwin:
 				create /file
 				write  /file
 				remove /file
@@ -111,6 +111,11 @@ func TestWatch(t *testing.T) {
 				create /sub
 				create /file
 				write  /sub
+				remove /sub
+				remove /file
+			darwin:
+				create /sub
+				create /file
 				remove /sub
 				remove /file
 			# Windows includes a write for the /sub dir too, two of them even(?)
@@ -168,7 +173,7 @@ func TestWatch(t *testing.T) {
 			remove   /file
 			create   /dir
 
-			windows:
+			windows, darwin:
 				create   /file
 				write    /file
 				remove   /file
@@ -187,7 +192,7 @@ func TestWatch(t *testing.T) {
 			write    /file
 			closewrite /file
 
-			windows:
+			windows, darwin:
 				write    /file
 		`},
 
@@ -273,7 +278,7 @@ func TestWatchCreate(t *testing.T) {
 			create  /file
 			closewrite /file
 
-			windows:
+			windows, darwin:
 				create  /file
 		`},
 		{"create file with data", func(t *testing.T, w *Watcher, tmp string) {
@@ -284,7 +289,7 @@ func TestWatchCreate(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows:
+			windows, darwin:
 				create  /file
 				write   /file
 		`},
@@ -423,7 +428,7 @@ func TestWatchWrite(t *testing.T) {
 			write  /file  # write Y
 			closewrite /file
 
-			windows:
+			windows, darwin:
 				write  /file  # write X
 				write  /file  # write Y
 		`},
@@ -485,6 +490,11 @@ func TestWatchRename(t *testing.T) {
 				create   /file
 				write    /file
 				remove   /file
+				create   /file
+			darwin:
+				create   /file
+				write    /file
+				rename   /file
 				create   /file
 		`},
 
@@ -566,6 +576,9 @@ func TestWatchRename(t *testing.T) {
 			windows:
 				rename    /file
 				write     /rename
+				write     /file
+			darwin:
+				rename    /file
 				write     /file
 		`},
 	}
@@ -706,6 +719,9 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
+			darwin:
+				CHMOD   "/file"
+				WRITE   "/file"
 		`},
 
 		{"chmod after write", func(t *testing.T, w *Watcher, tmp string) {
@@ -724,6 +740,10 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
+			darwin:
+				CHMOD   "/file"
+				WRITE   "/file"
+				CHMOD   "/file"
 		`},
 	}
 
