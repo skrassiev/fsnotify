@@ -50,7 +50,7 @@ func TestWatch(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				create  /file
 				write   /file
 				remove  /file
@@ -76,7 +76,7 @@ func TestWatch(t *testing.T) {
 			remove /file
 			remove /beforewatch
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				create /file
 				write  /file
 				remove /file
@@ -114,7 +114,7 @@ func TestWatch(t *testing.T) {
 				write  /sub
 				remove /sub
 				remove /file
-			darwin:
+			darwin, netbsd, openbsd:
 				create /sub
 				create /file
 				remove /sub
@@ -174,7 +174,7 @@ func TestWatch(t *testing.T) {
 			remove   /file
 			create   /dir
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				create   /file
 				write    /file
 				remove   /file
@@ -193,7 +193,7 @@ func TestWatch(t *testing.T) {
 			write    /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				write    /file
 		`},
 
@@ -279,7 +279,7 @@ func TestWatchCreate(t *testing.T) {
 			create  /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				create  /file
 		`},
 		{"create file with data", func(t *testing.T, w *Watcher, tmp string) {
@@ -290,7 +290,7 @@ func TestWatchCreate(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd:
 				create  /file
 				write   /file
 		`},
@@ -429,7 +429,7 @@ func TestWatchWrite(t *testing.T) {
 			write  /file  # write Y
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd:
 				write  /file  # write X
 				write  /file  # write Y
 		`},
@@ -492,7 +492,7 @@ func TestWatchRename(t *testing.T) {
 				write    /file
 				remove   /file
 				create   /file
-			darwin:
+			darwin, netbsd, openbsd:
 				create   /file
 				write    /file
 				rename   /file
@@ -578,7 +578,7 @@ func TestWatchRename(t *testing.T) {
 				rename    /file
 				write     /rename
 				write     /file
-			darwin:
+			darwin, netbsd, openbsd:
 				rename    /file
 				write     /file
 		`},
@@ -720,7 +720,7 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
-			darwin:
+			darwin, netbsd, openbsd:
 				CHMOD   "/file"
 				WRITE   "/file"
 		`},
@@ -741,7 +741,7 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
-			darwin:
+			darwin, netbsd, openbsd:
 				CHMOD   "/file"
 				WRITE   "/file"
 				CHMOD   "/file"
