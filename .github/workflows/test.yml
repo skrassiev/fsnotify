@@ -21,7 +21,7 @@ jobs:
         id: test
         uses: vmactions/openbsd-vm@v0
         with:
-          prepare: pkg_add -vvvvv go
+          prepare: pkg_add go
           run: |
             useradd -mG wheel action
             su action -c 'go test ./...'
