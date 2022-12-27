@@ -41,3 +41,22 @@ jobs:
           run: |
             useradd -mG wheel action
             su action -c 'go118 test ./...'
+
+  # illumos
+    testillumos:
+      runs-on: macos-12
+      name: test (illumos, 1.19)
+      steps:
+      - uses: actions/checkout@v2
+      - name: test (illumos, 1.19)
+        id: test
+        uses: papertigers/illumos-vm@r38
+        with:
+          prepare: |
+            pkg install go-119
+          run: |
+            useradd action
+            export GOCACHE=/tmp/go-cache
+            export GOPATH=/tmp/go-path
+            su action -c '/opt/ooce/go-1.19/bin/go test ./...'
+
