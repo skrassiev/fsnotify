@@ -290,7 +290,7 @@ func TestWatchCreate(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows, darwin, netbsd:
+			windows, darwin, netbsd, openbsd:
 				create  /file
 				write   /file
 		`},
