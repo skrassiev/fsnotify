@@ -199,7 +199,7 @@ func TestWatch(t *testing.T) {
 			write    /file
 			closewrite /file
 
-			windows, darwin, netbsd, openbsd:
+			windows, darwin, netbsd, openbsd, illumos:
 				write    /file
 		`},
 
@@ -228,8 +228,11 @@ func TestWatch(t *testing.T) {
 
 			# TODO: Symlinks followed on kqueue; it shouldn't do this, but I'm
 			# afraid changing it will break stuff. See #227, #390
-			kqueue, illumos:
+			kqueue:
 				write    /file
+
+			illumos:
+				write    /link
 
 			# TODO: see if we can fix this.
 			windows:
