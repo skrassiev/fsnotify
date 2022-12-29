@@ -50,7 +50,7 @@ func TestWatch(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				create  /file
 				write   /file
 				remove  /file
@@ -76,7 +76,7 @@ func TestWatch(t *testing.T) {
 			remove /file
 			remove /beforewatch
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				create /file
 				write  /file
 				remove /file
@@ -114,7 +114,7 @@ func TestWatch(t *testing.T) {
 				write  /sub
 				remove /sub
 				remove /file
-			darwin:
+			darwin, netbsd, openbsd:
 				create /sub
 				create /file
 				remove /sub
@@ -156,6 +156,12 @@ func TestWatch(t *testing.T) {
 
 			windows:
 				empty
+
+			illumos:
+				WRITE     "/file"
+				REMOVE    "/file"
+				REMOVE    "/file-unreadable"
+
 		`},
 
 		{"watch same dir twice", func(t *testing.T, w *Watcher, tmp string) {
@@ -174,7 +180,7 @@ func TestWatch(t *testing.T) {
 			remove   /file
 			create   /dir
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				create   /file
 				write    /file
 				remove   /file
@@ -193,7 +199,7 @@ func TestWatch(t *testing.T) {
 			write    /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				write    /file
 		`},
 
@@ -224,6 +230,9 @@ func TestWatch(t *testing.T) {
 			# afraid changing it will break stuff. See #227, #390
 			kqueue:
 				write    /file
+
+			illumos:
+				write    /link
 
 			# TODO: see if we can fix this.
 			windows:
@@ -258,7 +267,7 @@ func TestWatch(t *testing.T) {
 			kqueue:
 				create /dir/file
 
-			windows:
+			windows, illumos:
 				create    /link/file
 		`},
 	}
@@ -279,7 +288,7 @@ func TestWatchCreate(t *testing.T) {
 			create  /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				create  /file
 		`},
 		{"create file with data", func(t *testing.T, w *Watcher, tmp string) {
@@ -290,7 +299,7 @@ func TestWatchCreate(t *testing.T) {
 			write   /file
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				create  /file
 				write   /file
 		`},
@@ -397,7 +406,7 @@ func TestWatchWrite(t *testing.T) {
 				chmod     /file
 				write     /file
 
-			windows:
+			windows, illumos:
 				write  /file  # truncate
 				write  /file  # write
 		`},
@@ -429,7 +438,7 @@ func TestWatchWrite(t *testing.T) {
 			write  /file  # write Y
 			closewrite /file
 
-			windows, darwin:
+			windows, darwin, netbsd, openbsd, illumos:
 				write  /file  # write X
 				write  /file  # write Y
 		`},
@@ -492,7 +501,7 @@ func TestWatchRename(t *testing.T) {
 				write    /file
 				remove   /file
 				create   /file
-			darwin:
+			darwin, netbsd, openbsd, illumos:
 				create   /file
 				write    /file
 				rename   /file
@@ -578,7 +587,7 @@ func TestWatchRename(t *testing.T) {
 				rename    /file
 				write     /rename
 				write     /file
-			darwin:
+			darwin, netbsd, openbsd, illumos:
 				rename    /file
 				write     /file
 		`},
@@ -640,7 +649,7 @@ func TestWatchSymlink(t *testing.T) {
 				write     /link
 				closewrite /link
 
-			windows:
+			windows, illumos:
 				remove    /link
 				create    /link
 				write     /link
@@ -675,7 +684,7 @@ func TestWatchSymlink(t *testing.T) {
 			create   /pear
 			remove   /pear    # rm -r pear
 
-			windows:
+			windows, illumos:
 				create   /foo     # touch foo
 				remove   /foo     # rm foo
 				create   /apple   # mkdir apple
@@ -720,7 +729,7 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
-			darwin:
+			darwin, netbsd, openbsd, illumos:
 				CHMOD   "/file"
 				WRITE   "/file"
 		`},
@@ -741,7 +750,7 @@ func TestWatchAttrib(t *testing.T) {
 
 			windows:
 				write /file
-			darwin:
+			darwin, netbsd, openbsd, illumos:
 				CHMOD   "/file"
 				WRITE   "/file"
 				CHMOD   "/file"
