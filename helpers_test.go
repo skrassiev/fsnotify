@@ -107,6 +107,9 @@ func createFiles(t *testing.T, dir, prefix string, n int, d time.Duration) int {
 		default:
 			fp, err := os.Create(join(dir, prefix+fmtNum(i)))
 			if err != nil {
+				if strings.HasSuffix(err.Error(), "no space left on device") {
+					return created
+				}
 				t.Errorf("create failed for %s: %s", fmtNum(i), err)
 				continue
 			}
@@ -502,6 +505,8 @@ func newEvents(t *testing.T, s string) Events {
 					op |= Rename
 				case "CHMOD":
 					op |= Chmod
+				case "CLOSEWRITE":
+					op |= CloseWrite
 				default:
 					t.Fatalf("newEvents: line %d has unknown event %q: %s", no, ee, line)
 				}

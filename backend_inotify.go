@@ -271,7 +271,8 @@ func (w *Watcher) AddWith(name string, opts ...addOpt) error {
 
 	var flags uint32 = unix.IN_MOVED_TO | unix.IN_MOVED_FROM |
 		unix.IN_CREATE | unix.IN_ATTRIB | unix.IN_MODIFY |
-		unix.IN_MOVE_SELF | unix.IN_DELETE | unix.IN_DELETE_SELF
+		unix.IN_MOVE_SELF | unix.IN_DELETE | unix.IN_DELETE_SELF |
+		unix.IN_CLOSE_WRITE
 
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -498,6 +499,9 @@ func (w *Watcher) newEvent(name string, mask uint32) Event {
 	}
 	if mask&unix.IN_MODIFY == unix.IN_MODIFY {
 		e.Op |= Write
+	}
+	if mask&unix.IN_CLOSE_WRITE == unix.IN_CLOSE_WRITE {
+		e.Op |= CloseWrite
 	}
 	if mask&unix.IN_MOVE_SELF == unix.IN_MOVE_SELF || mask&unix.IN_MOVED_FROM == unix.IN_MOVED_FROM {
 		e.Op |= Rename

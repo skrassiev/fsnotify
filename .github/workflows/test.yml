@@ -1,4 +1,3 @@
-name: 'test'
 on:
   pull_request:
     paths: ['**.go', 'go.mod', '.github/workflows/*']
